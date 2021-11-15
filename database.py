@@ -26,6 +26,8 @@ state_label = Label(root, text="State")
 state_label.grid(row=4, column=0)
 zipcode_label = Label(root, text="Zipcode")
 zipcode_label.grid(row=5, column=0)
+delete_label = Label(root, text="Delete ID")
+delete_label.grid(row=9,column=0)
 
 # user input
 f_name =  Entry (root, width=25)
@@ -40,6 +42,8 @@ state = Entry(root, width=25)
 state.grid(row=4, column=1)
 zipcode = Entry(root, width=25)
 zipcode.grid(row=5, column=1)
+delete_entry = Entry(root, width=25)
+delete_entry.grid(row=9,column=1,columnspan=2,pady=10,padx=10)
 
 def submit():
 
@@ -73,24 +77,37 @@ def query():
 
     cur.execute("SELECT *, oid FROM addresses")
     profiles = cur.fetchall()
-    print(profiles)
+    # print(profiles[0])
 
     print_profiles = ''
-    for profile in profiles[0]:
-        print_profiles += str(profile) + "\n"
+    for profile in profiles:
+        print_profiles += str(profile[0]) + " " + str(profile[1]) + "\t" + str(profile[6]) + "\n"
 
     query_label = Label(root, text=print_profiles)
-    query_label.grid(row=8,column=0)
+    query_label.grid(row=11,column=0, columnspan=2)
 
+    conn.commit()
+    conn.close
+
+def delete():
+    conn = sqlite3.connect('address_book.db')
+    cur = conn.cursor()
+    
+    cur.execute("DELETE FROM addresses WHERE oid=" + delete_entry.get())
+    
     conn.commit()
     conn.close
 
 # submit button
 submit_button=Button(root, text="Submit", command=submit)
-submit_button.grid(row=6,column=0,columnspan=2,pady=10,padx=60)
+submit_button.grid(row=6,column=0,columnspan=2,pady=10,padx=10)
 
 # query button
 query_button=Button(root, text="Query", command=query)
-query_button.grid(row=7,column=0,columnspan=2,pady=10,padx=60)
-root.mainloop()
+query_button.grid(row=7,column=0,columnspan=2,pady=10,padx=10)
 
+# delete button
+delete_button=Button(root,text="Delete Records",command=delete)
+delete_button.grid(row=10,column=0,columnspan=2,pady=10,padx=10)
+
+root.mainloop()
